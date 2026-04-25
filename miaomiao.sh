@@ -67,7 +67,7 @@ install_mmw() {
       --user root \
       --name miaomiaowu \
       --restart always \
-      -p 0.0.0.0:8080:18080 \
+      -p 0.0.0.0:18080:8080 \
       -v $INSTALL_PATH/mmw-data:/app/data \
       -v $INSTALL_PATH/subscribes:/app/subscribes \
       -v $INSTALL_PATH/rule_templates:/app/rule_templates \
