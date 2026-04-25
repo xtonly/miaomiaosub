@@ -41,13 +41,13 @@ install_mmw() {
     apt-get update &>/dev/null
     apt-get install -y lsof psmisc &>/dev/null
 
-    echo -e "${YELLOW}第二步：正在强力清空 8080 端口...${NC}"
+    echo -e "${YELLOW}第二步：正在强力清空 18080 端口...${NC}"
     # 1. 停止重名容器
     docker stop miaomiaowu &>/dev/null
     docker rm miaomiaowu &>/dev/null
 
-    # 2. 停止任何占用 8080 的 Docker 容器
-    CONFLICT_ID=$(docker ps -q --filter "publish=8080")
+    # 2. 停止任何占用 18080 的 Docker 容器
+    CONFLICT_ID=$(docker ps -q --filter "publish=18080")
     if [ ! -z "$CONFLICT_ID" ]; then
         docker stop $CONFLICT_ID &>/dev/null
         docker rm $CONFLICT_ID &>/dev/null
@@ -55,7 +55,7 @@ install_mmw() {
 
     # 3. 强制杀死系统级占用进程 (使用刚才装好的 lsof)
     if command -v lsof &> /dev/null; then
-        lsof -t -i:8080 | xargs kill -9 &>/dev/null
+        lsof -t -i:18080 | xargs kill -9 &>/dev/null
     fi
 
     echo -e "${YELLOW}第三步：正在创建目录并启动容器...${NC}"
@@ -65,7 +65,7 @@ install_mmw() {
       --user root \
       --name miaomiaowu \
       --restart always \
-      -p 0.0.0.0:8080:8080 \
+      -p 0.0.0.0:18080:18080 \
       -v $INSTALL_PATH/mmw-data:/app/data \
       -v $INSTALL_PATH/subscribes:/app/subscribes \
       -v $INSTALL_PATH/rule_templates:/app/rule_templates \
@@ -76,7 +76,7 @@ install_mmw() {
         IPV4=$(curl -s4 ifconfig.me)
         echo -e "\n${GREEN}======================================${NC}"
         echo -e "${GREEN} 妙妙屋 (v3.0 自动化版) 部署成功！        ${NC}"
-        echo -e " 访问地址: ${BLUE}http://${IPV4}:8080${NC} "
+        echo -e " 访问地址: ${BLUE}http://${IPV4}:18080${NC} "
         echo -e "${GREEN}======================================${NC}"
     else
         echo -e "${RED}部署失败！请检查 Docker 是否正常工作。${NC}"
