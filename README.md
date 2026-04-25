@@ -14,7 +14,7 @@ wget --no-check-certificate -O miaomiao.sh https://raw.githubusercontent.com/xto
 
 妙妙屋文档：
 
-[https://github.com/iluobei/miaomiaowu](https://miaomiaowu.net/docs)
+https://miaomiaowu.net/docs
 
 
 
