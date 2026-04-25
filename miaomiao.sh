@@ -16,10 +16,10 @@ INSTALL_PATH="/opt/miaomiaowu"
 show_menu() {
     clear
     echo -e "${BLUE}======================================${NC}"
-    echo -e "${BLUE}      喵喵屋 (MiaoMiaoWu) 管理脚本     ${NC}"
+    echo -e "${BLUE}      妙妙屋 (MiaoMiaoWu) 管理脚本     ${NC}"
     echo -e "${BLUE}======================================${NC}"
-    echo -e "${GREEN} 1.${NC} 安装/更新 喵喵屋(强制释放端口版)"
-    echo -e "${RED} 2.${NC} 彻底卸载 喵喵屋(清理所有数据)"
+    echo -e "${GREEN} 1.${NC} 安装/更新 妙妙屋 (强制释放端口版)"
+    echo -e "${RED} 2.${NC} 彻底卸载 妙妙屋 (清理所有数据)"
     echo -e "${YELLOW} 3.${NC} 重启服务"
     echo -e "${BLUE} 4.${NC} 查看实时运行日志"
     echo -e "${GREEN} 0.${NC} 退出脚本"
@@ -69,7 +69,7 @@ install_mmw() {
     if [ $? -eq 0 ]; then
         IPV4=$(curl -4 -s ifconfig.me)
         echo -e "\n${GREEN}======================================${NC}"
-        echo -e "${GREEN}       喵喵屋 (IPv4纯净版) 部署成功！ ${NC}"
+        echo -e "${GREEN}       妙妙屋 (IPv4纯净版) 部署成功！ ${NC}"
         echo -e "访问地址: ${BLUE}http://${IPV4}:8080${NC}"
         echo -e "${GREEN}======================================${NC}"
     else
