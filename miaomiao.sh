@@ -16,7 +16,7 @@ INSTALL_PATH="/opt/miaomiaowu"
 show_menu() {
     clear
     echo -e "${BLUE}=========================================${NC}"
-    echo -e "${BLUE}    妙妙屋 (MiaoMiaoWu) 管理脚本  3.2     ${NC}"
+    echo -e "${BLUE}    妙妙屋 (MiaoMiaoWu) 管理脚本  3.3     ${NC}"
     echo -e "${BLUE}=========================================${NC}"
     echo -e "${GREEN} 1.${NC} 安装/更新 妙妙屋"
     echo -e "${RED} 2.${NC} 彻底卸载 妙妙屋"
@@ -36,29 +36,31 @@ show_menu() {
 }
 
 install_mmw() {
-    echo -e "${YELLOW}第一步：正在自动补齐系统工具 (lsof/psmisc)...${NC}"
-    # 针对 Debian/Ubuntu 的自动安装
-    apt-get update &>/dev/null
-    apt-get install -y lsof psmisc &>/dev/null
+    echo -e "${YELLOW}第一步：正在安装必要工具 (lsof/psmisc)...${NC}"
+    apt-get update &>/dev/null && apt-get install -y lsof psmisc &>/dev/null
 
-    echo -e "${YELLOW}第二步：正在强力清空 8080 端口...${NC}"
-    # 1. 停止重名容器
-    docker stop miaomiaowu &>/dev/null
-    docker rm miaomiaowu &>/dev/null
-
-    # 2. 停止任何占用 8080 的 Docker 容器
-    CONFLICT_ID=$(docker ps -q --filter "publish=8080")
-    if [ ! -z "$CONFLICT_ID" ]; then
-        docker stop $CONFLICT_ID &>/dev/null
-        docker rm $CONFLICT_ID &>/dev/null
+    echo -e "${YELLOW}第二步：深度清理 8080 端口...${NC}"
+    
+    # 1. 尝试停止 Docker 冲突容器
+    docker stop miaomiaowu &>/dev/null && docker rm miaomiaowu &>/dev/null
+    
+    # 2. 暴力解决：直接通过端口号杀死所有进程
+    # 获取占用 8080 的进程 PID 并强制杀掉
+    PIDS=$(lsof -t -i:8080)
+    if [ ! -z "$PIDS" ]; then
+        echo -e "${RED}检测到端口 8080 被进程 $PIDS 占用，正在强制粉碎...${NC}"
+        kill -9 $PIDS &>/dev/null
+        sleep 1
     fi
 
-    # 3. 强制杀死系统级占用进程 (使用刚才装好的 lsof)
-    if command -v lsof &> /dev/null; then
-        lsof -t -i:8080 | xargs kill -9 &>/dev/null
+    # 3. 二次检查确保端口空闲
+    if lsof -i:8080 > /dev/null; then
+        echo -e "${RED}错误：端口 8080 无法释放！请检查是否为系统核心服务。${NC}"
+        read -n 1 -s -r -p "按任意键返回菜单..."
+        return
     fi
 
-    echo -e "${YELLOW}第三步：正在创建目录并启动容器...${NC}"
+    echo -e "${YELLOW}第三步：启动喵喵屋容器...${NC}"
     mkdir -p $INSTALL_PATH/mmw-data $INSTALL_PATH/subscribes $INSTALL_PATH/rule_templates
     
     docker run -d \
@@ -75,11 +77,11 @@ install_mmw() {
     if [ $? -eq 0 ]; then
         IPV4=$(curl -s4 ifconfig.me)
         echo -e "\n${GREEN}========================================${NC}"
-        echo -e "${GREEN} 妙妙屋 3.2 部署成功！        ${NC}"
+        echo -e "${GREEN} 妙妙屋 3.3 部署成功！        ${NC}"
         echo -e " 访问地址: ${BLUE}http://${IPV4}:8080${NC} "
         echo -e "${GREEN}========================================${NC}"
     else
-        echo -e "${RED}部署失败！请检查 Docker 是否正常工作。${NC}"
+        echo -e "${RED}启动失败，可能是 Docker 守护进程异常。${NC}"
     fi
     read -n 1 -s -r -p "按任意键返回菜单..."
     show_menu
