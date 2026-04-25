@@ -16,7 +16,7 @@ INSTALL_PATH="/opt/miaomiaowu"
 show_menu() {
     clear
     echo -e "${BLUE}=========================================${NC}"
-    echo -e "${BLUE}    妙妙屋 (MiaoMiaoWu) 管理脚本  3.1     ${NC}"
+    echo -e "${BLUE}    妙妙屋 (MiaoMiaoWu) 管理脚本  3.2     ${NC}"
     echo -e "${BLUE}=========================================${NC}"
     echo -e "${GREEN} 1.${NC} 安装/更新 妙妙屋"
     echo -e "${RED} 2.${NC} 彻底卸载 妙妙屋"
@@ -75,7 +75,7 @@ install_mmw() {
     if [ $? -eq 0 ]; then
         IPV4=$(curl -s4 ifconfig.me)
         echo -e "\n${GREEN}========================================${NC}"
-        echo -e "${GREEN} 妙妙屋 3.1 部署成功！        ${NC}"
+        echo -e "${GREEN} 妙妙屋 3.2 部署成功！        ${NC}"
         echo -e " 访问地址: ${BLUE}http://${IPV4}:8080${NC} "
         echo -e "${GREEN}========================================${NC}"
     else
