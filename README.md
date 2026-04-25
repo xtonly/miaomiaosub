@@ -2,9 +2,12 @@
 
 
 
+
 一键 Docker 部署
 
+
 wget --no-check-certificate -O miaomiao.sh https://raw.githubusercontent.com/xtonly/miaomiaosub/refs/heads/main/miaomiao.sh && chmod +x miaomiao.sh && ./miaomiao.sh
+
 
 
 #########################################
