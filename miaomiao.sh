@@ -15,11 +15,11 @@ INSTALL_PATH="/opt/miaomiaowu"
 
 show_menu() {
     clear
-    echo -e "${BLUE}======================================${NC}"
-    echo -e "${BLUE}      妙妙屋 (MiaoMiaoWu) 管理脚本     ${NC}"
-    echo -e "${BLUE}======================================${NC}"
-    echo -e "${GREEN} 1.${NC} 安装/更新 妙妙屋 (强制释放端口版)"
-    echo -e "${RED} 2.${NC} 彻底卸载 妙妙屋 (清理所有数据)"
+    echo -e "${BLUE}=========================================${NC}"
+    echo -e "${BLUE}      妙妙屋 (MiaoMiaoWu) 管理脚本  3.0   ${NC}"
+    echo -e "${BLUE}=========================================${NC}"
+    echo -e "${GREEN} 1.${NC} 安装/更新 妙妙屋"
+    echo -e "${RED} 2.${NC} 彻底卸载 妙妙屋"
     echo -e "${YELLOW} 3.${NC} 重启服务"
     echo -e "${BLUE} 4.${NC} 查看实时运行日志"
     echo -e "${GREEN} 0.${NC} 退出脚本"
@@ -36,25 +36,31 @@ show_menu() {
 }
 
 install_mmw() {
-    echo -e "${GREEN}正在清理冲突环境...${NC}"
-    
-    # 1. 停止并删除重名容器
+    echo -e "${YELLOW}第一步：正在自动补齐系统工具 (lsof/psmisc)...${NC}"
+    # 针对 Debian/Ubuntu 的自动安装
+    apt-get update &>/dev/null
+    apt-get install -y lsof psmisc &>/dev/null
+
+    echo -e "${YELLOW}第二步：正在强力清空 8080 端口...${NC}"
+    # 1. 停止重名容器
     docker stop miaomiaowu &>/dev/null
     docker rm miaomiaowu &>/dev/null
 
-    # 2. 暴力清理占用 8080 端口的进程 (如果是其他 Docker 容器)
-    CONFLICT_CONTAINER=$(docker ps -q --filter "publish=8080")
-    if [ ! -z "$CONFLICT_CONTAINER" ]; then
-        echo -e "${YELLOW}检测到其他容器占用 8080 端口，正在清理...${NC}"
-        docker stop $CONFLICT_CONTAINER &>/dev/null
-        docker rm $CONFLICT_CONTAINER &>/dev/null
+    # 2. 停止任何占用 8080 的 Docker 容器
+    CONFLICT_ID=$(docker ps -q --filter "publish=8080")
+    if [ ! -z "$CONFLICT_ID" ]; then
+        docker stop $CONFLICT_ID &>/dev/null
+        docker rm $CONFLICT_ID &>/dev/null
     fi
 
-    # 3. 创建目录
+    # 3. 强制杀死系统级占用进程 (使用刚才装好的 lsof)
+    if command -v lsof &> /dev/null; then
+        lsof -t -i:8080 | xargs kill -9 &>/dev/null
+    fi
+
+    echo -e "${YELLOW}第三步：正在创建目录并启动容器...${NC}"
     mkdir -p $INSTALL_PATH/mmw-data $INSTALL_PATH/subscribes $INSTALL_PATH/rule_templates
     
-    # 4. 运行官方镜像
-    echo -e "${GREEN}正在拉取并启动容器...${NC}"
     docker run -d \
       --user root \
       --name miaomiaowu \
@@ -67,30 +73,27 @@ install_mmw() {
       ghcr.io/iluobei/miaomiaowu:latest
 
     if [ $? -eq 0 ]; then
-        IPV4=$(curl -4 -s ifconfig.me)
+        IPV4=$(curl -s4 ifconfig.me)
         echo -e "\n${GREEN}======================================${NC}"
-        echo -e "${GREEN}       妙妙屋 (IPv4纯净版) 部署成功！ ${NC}"
+        echo -e "${GREEN}       妙妙屋 (v3.0 自动化版) 部署成功！${NC}"
         echo -e "访问地址: ${BLUE}http://${IPV4}:8080${NC}"
         echo -e "${GREEN}======================================${NC}"
     else
-        echo -e "${RED}部署失败！即使强制清理后端口仍被占用。${NC}"
-        echo -e "${YELLOW}请尝试运行: fuser -k 8080/tcp 手动释放端口后再试。${NC}"
+        echo -e "${RED}部署失败！请检查 Docker 是否正常工作。${NC}"
     fi
     read -n 1 -s -r -p "按任意键返回菜单..."
     show_menu
 }
 
 uninstall_mmw() {
-    echo -e "${RED}警告：此操作将删除所有配置、数据库和镜像！${NC}"
-    read -p "确定要彻底卸载吗？(y/n): " confirm
+    echo -e "${RED}警告：此操作将彻底删除所有数据！${NC}"
+    read -p "确定卸载吗？(y/n): " confirm
     if [[ $confirm == [yY] ]]; then
         docker stop miaomiaowu &>/dev/null
         docker rm miaomiaowu &>/dev/null
         docker rmi ghcr.io/iluobei/miaomiaowu:latest &>/dev/null
         rm -rf $INSTALL_PATH
-        echo -e "${GREEN}卸载完成，系统已恢复纯净！${NC}"
-    else
-        echo "已取消卸载。"
+        echo -e "${GREEN}卸载成功，数据已清空。${NC}"
     fi
     read -n 1 -s -r -p "按任意键返回菜单..."
     show_menu
@@ -104,7 +107,7 @@ restart_mmw() {
 }
 
 view_logs() {
-    echo -e "${YELLOW}正在查看日志 (按 Ctrl+C 退出)...${NC}"
+    echo -e "${YELLOW}正在查看日志 (Ctrl+C 退出)...${NC}"
     docker logs -f miaomiaowu
 }
 
