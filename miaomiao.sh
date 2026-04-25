@@ -23,7 +23,7 @@ show_menu() {
     echo -e "${YELLOW} 3.${NC} 重启服务"
     echo -e "${BLUE} 4.${NC} 查看实时运行日志"
     echo -e "${GREEN} 0.${NC} 退出脚本"
-    echo -e "${BLUE}======================================${NC}"
+    echo -e "${BLUE}=========================================${NC}"
     read -p "请输入数字选择 [0-4]: " choice
     case $choice in
         1) install_mmw ;;
