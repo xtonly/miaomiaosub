@@ -76,8 +76,8 @@ install_mmw() {
         IPV4=$(curl -s4 ifconfig.me)
         echo -e "\n${GREEN}======================================${NC}"
         echo -e "${GREEN} 妙妙屋 (v3.0 自动化版) 部署成功！        ${NC}"
-        echo -e "访问地址: ${BLUE}http://${IPV4}:8080${NC}"
-        echo -e "${GREEN}========================================${NC}"
+        echo -e " 访问地址: ${BLUE}http://${IPV4}:8080${NC}"
+        echo -e "${GREEN}======================================${NC}"
     else
         echo -e "${RED}部署失败！请检查 Docker 是否正常工作。${NC}"
     fi
