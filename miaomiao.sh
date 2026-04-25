@@ -16,7 +16,7 @@ INSTALL_PATH="/opt/miaomiaowu"
 show_menu() {
     clear
     echo -e "${BLUE}=========================================${NC}"
-    echo -e "${BLUE}    妙妙屋 (MiaoMiaoWu) 管理脚本  3.3     ${NC}"
+    echo -e "${BLUE}    妙妙屋 (MiaoMiaoWu) 管理脚本  3.4     ${NC}"
     echo -e "${BLUE}=========================================${NC}"
     echo -e "${GREEN} 1.${NC} 安装/更新 妙妙屋"
     echo -e "${RED} 2.${NC} 彻底卸载 妙妙屋"
@@ -39,23 +39,23 @@ install_mmw() {
     echo -e "${YELLOW}第一步：正在安装必要工具 (lsof/psmisc)...${NC}"
     apt-get update &>/dev/null && apt-get install -y lsof psmisc &>/dev/null
 
-    echo -e "${YELLOW}第二步：深度清理 8080 端口...${NC}"
+    echo -e "${YELLOW}第二步：深度清理 18080 端口...${NC}"
     
     # 1. 尝试停止 Docker 冲突容器
     docker stop miaomiaowu &>/dev/null && docker rm miaomiaowu &>/dev/null
     
     # 2. 暴力解决：直接通过端口号杀死所有进程
-    # 获取占用 8080 的进程 PID 并强制杀掉
-    PIDS=$(lsof -t -i:8080)
+    # 获取占用 18080 的进程 PID 并强制杀掉
+    PIDS=$(lsof -t -i:18080)
     if [ ! -z "$PIDS" ]; then
-        echo -e "${RED}检测到端口 8080 被进程 $PIDS 占用，正在强制粉碎...${NC}"
+        echo -e "${RED}检测到端口 18080 被进程 $PIDS 占用，正在强制粉碎...${NC}"
         kill -9 $PIDS &>/dev/null
         sleep 1
     fi
 
     # 3. 二次检查确保端口空闲
-    if lsof -i:8080 > /dev/null; then
-        echo -e "${RED}错误：端口 8080 无法释放！请检查是否为系统核心服务。${NC}"
+    if lsof -i:18080 > /dev/null; then
+        echo -e "${RED}错误：端口 18080 无法释放！请检查是否为系统核心服务。${NC}"
         read -n 1 -s -r -p "按任意键返回菜单..."
         return
     fi
@@ -67,7 +67,7 @@ install_mmw() {
       --user root \
       --name miaomiaowu \
       --restart always \
-      -p 0.0.0.0:8080:8080 \
+      -p 0.0.0.0:8080:18080 \
       -v $INSTALL_PATH/mmw-data:/app/data \
       -v $INSTALL_PATH/subscribes:/app/subscribes \
       -v $INSTALL_PATH/rule_templates:/app/rule_templates \
@@ -77,8 +77,8 @@ install_mmw() {
     if [ $? -eq 0 ]; then
         IPV4=$(curl -s4 ifconfig.me)
         echo -e "\n${GREEN}========================================${NC}"
-        echo -e "${GREEN} 妙妙屋 3.3 部署成功！        ${NC}"
-        echo -e " 访问地址: ${BLUE}http://${IPV4}:8080${NC} "
+        echo -e "${GREEN} 妙妙屋 3.4 部署成功！        ${NC}"
+        echo -e " 访问地址: ${BLUE}http://${IPV4}:18080${NC} "
         echo -e "${GREEN}========================================${NC}"
     else
         echo -e "${RED}启动失败，可能是 Docker 守护进程异常。${NC}"
