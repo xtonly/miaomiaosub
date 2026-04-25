@@ -16,7 +16,7 @@ INSTALL_PATH="/opt/miaomiaowu"
 show_menu() {
     clear
     echo -e "${BLUE}=========================================${NC}"
-    echo -e "${BLUE}      妙妙屋 (MiaoMiaoWu) 管理脚本  3.0   ${NC}"
+    echo -e "${BLUE}    妙妙屋 (MiaoMiaoWu) 管理脚本  3.0     ${NC}"
     echo -e "${BLUE}=========================================${NC}"
     echo -e "${GREEN} 1.${NC} 安装/更新 妙妙屋"
     echo -e "${RED} 2.${NC} 彻底卸载 妙妙屋"
